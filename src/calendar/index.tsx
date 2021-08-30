@@ -4,7 +4,7 @@ import XDate from 'xdate';
 import memoize from 'memoize-one';
 
 import React, {Component, RefObject} from 'react';
-import {View, ViewStyle, StyleProp} from 'react-native';
+import {View, ViewStyle, StyleProp, ScrollView} from 'react-native';
 // @ts-expect-error
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
@@ -71,6 +71,8 @@ export interface CalendarProps extends CalendarHeaderProps, DayProps {
   headerStyle?: ViewStyle;
   /** Allow rendering of a totally custom header */
   customHeader?: any;
+  /** To show the calendar as a horizontal strip*/
+  horizontal?: boolean;
 }
 
 interface CalendarState {
@@ -126,7 +128,9 @@ class Calendar extends Component<CalendarProps, CalendarState> {
     /** Style passed to the header */
     headerStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.array]),
     /** Allow rendering of a totally custom header */
-    customHeader: PropTypes.any
+    customHeader: PropTypes.any,
+    /** To show the calendar as a horizontal strip*/
+    horizontal: PropTypes.bool
   };
   static defaultProps = {
     enableSwipeMonths: false
@@ -241,6 +245,7 @@ class Calendar extends Component<CalendarProps, CalendarState> {
           marking={markedDates?.[toMarkingFormat(day)]}
           onPress={this.pressDay}
           onLongPress={this.longPressDay}
+          horizontal={this.props.horizontal}
         />
       </View>
     );
@@ -275,11 +280,21 @@ class Calendar extends Component<CalendarProps, CalendarState> {
       weeks.push(this.renderWeek(days.splice(0, 7), weeks.length));
     }
 
-    return <View style={this.style.monthView}>{weeks}</View>;
+    return (
+      <>
+        {this.props.horizontal ? (
+          <ScrollView style={this.style.monthView} horizontal>
+            {weeks}
+          </ScrollView>
+        ) : (
+          <View style={this.style.monthView}>{weeks}</View>
+        )}
+      </>
+    );
   }
 
   renderHeader() {
-    const {customHeader, headerStyle, displayLoadingIndicator, markedDates, testID} = this.props;
+    const {customHeader, headerStyle, displayLoadingIndicator, markedDates, testID, horizontal} = this.props;
     const current = parseDate(this.props.current);
     let indicator;
 
@@ -303,6 +318,7 @@ class Calendar extends Component<CalendarProps, CalendarState> {
         month={this.state.currentMonth}
         addMonth={this.addMonth}
         displayLoadingIndicator={indicator}
+        horizontal={horizontal}
       />
     );
   }
