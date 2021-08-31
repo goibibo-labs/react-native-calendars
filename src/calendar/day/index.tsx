@@ -12,16 +12,19 @@ import {shouldUpdate} from '../../component-updater';
 import {isToday as dateutils_isToday} from '../../dateutils';
 // @ts-expect-error
 import {xdateToData} from '../../interface';
+import {Theme} from 'types';
 // @ts-expect-error
 import {SELECT_DATE_SLOT} from '../../testIDs';
 import BasicDay, {BasicDayProps} from './basic';
 import PeriodDay from './period';
 import {MarkingProps} from './marking';
+import styleConstructor from './../header/style';
 
 const basicDayPropsTypes = _.omit(BasicDay.propTypes, 'date');
 const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 export interface DayProps extends Omit<BasicDayProps, 'date'> {
+  theme?: Theme;
   /** The day to render */
   day?: Date;
   /** Provide custom day rendering component */
@@ -35,6 +38,7 @@ export default class Day extends Component<DayProps> {
 
   static propTypes = {
     ...basicDayPropsTypes,
+    theme: PropTypes.object,
     /** The day to render */
     day: PropTypes.object,
     /** Provide custom day rendering component */
@@ -42,6 +46,14 @@ export default class Day extends Component<DayProps> {
     /** To show the calendar as a horizontal strip*/
     horizontal: PropTypes.bool
   };
+
+  style: any;
+
+  constructor(props: DayProps) {
+    super(props);
+
+    this.style = styleConstructor(props.theme);
+  }
 
   shouldComponentUpdate(nextProps: DayProps) {
     return shouldUpdate(this.props, nextProps, [
@@ -118,7 +130,7 @@ export default class Day extends Component<DayProps> {
       <>
         {this.props.horizontal ? (
           <View style={[styles.m8, styles.container]}>
-            <Text style={[styles.mt7, styles.mb14, , styles.text]}>{date ? dayNames[day?.getDay() || 0] : day}</Text>
+            <Text style={[this.style.dayHeader, styles.mb18]}>{date ? dayNames[day?.getDay() || 0] : day}</Text>
             <Component
               {...dayProps}
               date={date}
@@ -147,17 +159,8 @@ const styles = StyleSheet.create({
   m8: {
     margin: 8
   },
-  mt7: {
-    marginVertical: 7
-  },
-  mb14: {
+  mb18: {
     marginBottom: 18
-  },
-  text: {
-    fontSize: 12,
-    color: '#9B9B9B',
-    fontFamily: 'Lato',
-    letterSpacing: 1
   },
   container: {
     flex: 1,

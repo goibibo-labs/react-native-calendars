@@ -4,7 +4,7 @@ import XDate from 'xdate';
 import memoize from 'memoize-one';
 
 import React, {Component, RefObject} from 'react';
-import {View, ViewStyle, StyleProp, ScrollView} from 'react-native';
+import {View, ViewStyle, StyleProp, ScrollView, Dimensions} from 'react-native';
 // @ts-expect-error
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
@@ -29,6 +29,8 @@ import {MarkingProps} from './day/marking';
 type MarkedDatesType = {
   [key: string]: MarkingProps;
 };
+
+let horizontalScrollViewOffset = 0;
 
 export interface CalendarProps extends CalendarHeaderProps, DayProps {
   /** Specify theme properties to override specific styles for calendar parts */
@@ -141,6 +143,18 @@ class Calendar extends Component<CalendarProps, CalendarState> {
   };
   style = styleConstructor(this.props.theme);
   header: RefObject<CalendarHeader> = React.createRef();
+  horizontalScrollViewRef: RefObject<ScrollView> = React.createRef();
+
+  componentDidMount() {
+    const horizontalScrollView = this.horizontalScrollViewRef.current;
+    if (horizontalScrollView) {
+      const windowWidth = Dimensions.get('window').width;
+      horizontalScrollView.scrollTo({
+        x: horizontalScrollViewOffset * windowWidth,
+        animated: true
+      });
+    }
+  }
 
   addMonth = (count: number) => {
     this.updateMonth(this.state.currentMonth.clone().addMonths(count, true));
@@ -256,6 +270,10 @@ class Calendar extends Component<CalendarProps, CalendarState> {
 
     days.forEach((day: any, id2: number) => {
       week.push(this.renderDay(day, id2));
+      const dayTime = day.getTime();
+      if (dayTime === parseDate(this.props?.current)?.getTime()) {
+        horizontalScrollViewOffset = id2;
+      }
     }, this);
 
     if (this.props.showWeekNumbers) {
@@ -283,7 +301,12 @@ class Calendar extends Component<CalendarProps, CalendarState> {
     return (
       <>
         {this.props.horizontal ? (
-          <ScrollView style={this.style.monthView} horizontal>
+          <ScrollView
+            style={this.style.monthView}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            ref={this.horizontalScrollViewRef}
+          >
             {weeks}
           </ScrollView>
         ) : (
