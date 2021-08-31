@@ -289,7 +289,7 @@ class CalendarHeader extends Component<Props> {
           </View>
           {this.renderArrow('right')}
         </View>
-        {this.props.horizontal === undefined || this.props.horizontal === false ? this.renderDayNames() : null}
+        {!this.props.horizontal ? this.renderDayNames() : null}
       </View>
     );
   }

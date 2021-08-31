@@ -35,7 +35,6 @@ const CalendarsScreen = () => {
               selectedTextColor: 'red'
             }
           }}
-          horizontal={true}
         />
       </Fragment>
     );
@@ -45,7 +44,7 @@ const CalendarsScreen = () => {
     return (
       <Fragment>
         <Text style={styles.text}>Calendar with week numbers</Text>
-        <Calendar style={styles.calendar} hideExtraDays showWeekNumbers horizontal={false} />
+        <Calendar style={styles.calendar} hideExtraDays showWeekNumbers />
       </Fragment>
     );
   };

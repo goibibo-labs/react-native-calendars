@@ -127,30 +127,24 @@ export default class Day extends Component<DayProps> {
     const accessibilityLabel = this.getAccessibilityLabel(day, marking, isToday);
 
     return (
-      <>
-        {this.props.horizontal ? (
-          <View style={[styles.m8, styles.container]}>
-            <Text style={[this.style.dayHeader, styles.mb18]}>{date ? dayNames[day?.getDay() || 0] : day}</Text>
-            <Component
-              {...dayProps}
-              date={date}
-              testID={`${SELECT_DATE_SLOT}-${date.dateString}`}
-              accessibilityLabel={accessibilityLabel}
-            >
-              {date ? day?.getDate() : day}
-            </Component>
-          </View>
-        ) : (
-          <Component
-            {...dayProps}
-            date={date}
-            testID={`${SELECT_DATE_SLOT}-${date.dateString}`}
-            accessibilityLabel={accessibilityLabel}
-          >
-            {date ? day?.getDate() : day}
-          </Component>
+      <View
+        style={[
+          this.props.horizontal === true ? styles.m8 : null,
+          this.props.horizontal === true ? styles.container : null
+        ]}
+      >
+        {this.props.horizontal && (
+          <Text style={[this.style.dayHeader, styles.mb18]}>{date ? dayNames[day?.getDay() || 0] : day}</Text>
         )}
-      </>
+        <Component
+          {...dayProps}
+          date={date}
+          testID={`${SELECT_DATE_SLOT}-${date.dateString}`}
+          accessibilityLabel={accessibilityLabel}
+        >
+          {date ? day?.getDate() : day}
+        </Component>
+      </View>
     );
   }
 }
