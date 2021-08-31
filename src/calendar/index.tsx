@@ -4,7 +4,7 @@ import XDate from 'xdate';
 import memoize from 'memoize-one';
 
 import React, {Component, RefObject} from 'react';
-import {View, ViewStyle, StyleProp} from 'react-native';
+import {View, ViewStyle, StyleProp, ScrollView, Dimensions} from 'react-native';
 // @ts-expect-error
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
@@ -29,6 +29,8 @@ import {MarkingProps} from './day/marking';
 type MarkedDatesType = {
   [key: string]: MarkingProps;
 };
+
+let horizontalScrollViewOffset = 0;
 
 export interface CalendarProps extends CalendarHeaderProps, DayProps {
   /** Specify theme properties to override specific styles for calendar parts */
@@ -73,6 +75,8 @@ export interface CalendarProps extends CalendarHeaderProps, DayProps {
   customHeader?: any;
   /** Allow selection of dates before minDate or after maxDate */
   allowSelectionOutOfRange?: boolean;
+  /** To show the calendar as a horizontal strip*/
+  horizontal?: boolean;
 }
 
 interface CalendarState {
@@ -130,7 +134,9 @@ class Calendar extends Component<CalendarProps, CalendarState> {
     /** Allow rendering of a totally custom header */
     customHeader: PropTypes.any,
     /** Allow selection of dates before minDate or after maxDate */
-    allowSelectionOutOfRange: PropTypes.bool
+    allowSelectionOutOfRange: PropTypes.bool,
+    /** To show the calendar as a horizontal strip*/
+    horizontal: PropTypes.bool
   };
   static defaultProps = {
     enableSwipeMonths: false
@@ -141,6 +147,18 @@ class Calendar extends Component<CalendarProps, CalendarState> {
   };
   style = styleConstructor(this.props.theme);
   header: RefObject<CalendarHeader> = React.createRef();
+  horizontalScrollViewRef: RefObject<ScrollView> = React.createRef();
+
+  componentDidMount() {
+    const horizontalScrollView = this.horizontalScrollViewRef.current;
+    if (horizontalScrollView) {
+      const windowWidth = Dimensions.get('window').width;
+      horizontalScrollView.scrollTo({
+        x: horizontalScrollViewOffset * windowWidth,
+        animated: true
+      });
+    }
+  }
 
   addMonth = (count: number) => {
     this.updateMonth(this.state.currentMonth.clone().addMonths(count, true));
@@ -245,6 +263,7 @@ class Calendar extends Component<CalendarProps, CalendarState> {
           marking={markedDates?.[toMarkingFormat(day)]}
           onPress={this.pressDay}
           onLongPress={this.longPressDay}
+          horizontal={this.props.horizontal}
         />
       </View>
     );
@@ -255,6 +274,10 @@ class Calendar extends Component<CalendarProps, CalendarState> {
 
     days.forEach((day: any, id2: number) => {
       week.push(this.renderDay(day, id2));
+      const dayTime = day.getTime();
+      if (dayTime === parseDate(this.props?.current)?.getTime()) {
+        horizontalScrollViewOffset = id2;
+      }
     }, this);
 
     if (this.props.showWeekNumbers) {
@@ -279,11 +302,26 @@ class Calendar extends Component<CalendarProps, CalendarState> {
       weeks.push(this.renderWeek(days.splice(0, 7), weeks.length));
     }
 
-    return <View style={this.style.monthView}>{weeks}</View>;
+    return (
+      <>
+        {this.props.horizontal ? (
+          <ScrollView
+            style={this.style.monthView}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            ref={this.horizontalScrollViewRef}
+          >
+            {weeks}
+          </ScrollView>
+        ) : (
+          <View style={this.style.monthView}>{weeks}</View>
+        )}
+      </>
+    );
   }
 
   renderHeader() {
-    const {customHeader, headerStyle, displayLoadingIndicator, markedDates, testID} = this.props;
+    const {customHeader, headerStyle, displayLoadingIndicator, markedDates, testID, horizontal} = this.props;
     const current = parseDate(this.props.current);
     let indicator;
 
@@ -307,6 +345,7 @@ class Calendar extends Component<CalendarProps, CalendarState> {
         month={this.state.currentMonth}
         addMonth={this.addMonth}
         displayLoadingIndicator={indicator}
+        horizontal={horizontal}
       />
     );
   }
