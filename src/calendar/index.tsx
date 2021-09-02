@@ -185,15 +185,15 @@ class Calendar extends Component<CalendarProps, CalendarState> {
     const maxDate = parseDate(this.props.maxDate);
 
     if (allowSelectionOutOfRange || !(minDate && !isGTE(day, minDate)) && !(maxDate && !isLTE(day, maxDate))) {
-      const shouldUpdateMonth = disableMonthChange === undefined || !disableMonthChange;
+     const shouldUpdateMonth = disableMonthChange === undefined || !disableMonthChange;
 
-      if (shouldUpdateMonth) {
-        this.updateMonth(day);
-      }
-      if (interaction) {
-        interaction(xdateToData(day));
-      }
-    }
+     if (shouldUpdateMonth) {
+       this.updateMonth(day);
+     }
+     if (interaction) {
+       interaction(xdateToData(day));
+     }
+   }
   }
 
   pressDay = (date: Date) => {
@@ -306,7 +306,7 @@ class Calendar extends Component<CalendarProps, CalendarState> {
       <>
         {this.props.horizontal ? (
           <ScrollView
-            style={this.style.monthView}
+            style={[this.style.monthView, {minHeight: 85}]}
             showsHorizontalScrollIndicator={false}
             horizontal
             ref={this.horizontalScrollViewRef}

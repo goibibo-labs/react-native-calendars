@@ -53,8 +53,6 @@ interface Props {
   style?: StyleProp<ViewStyle>;
   accessibilityElementsHidden?: boolean;
   importantForAccessibility?: 'auto' | 'yes' | 'no' | 'no-hide-descendants';
-  /** To show the calendar as a horizontal strip*/
-  horizontal?: boolean;
 }
 export type CalendarHeaderProps = Props;
 
@@ -89,9 +87,7 @@ class CalendarHeader extends Component<Props> {
     /** Replace default month and year title with custom one. the function receive a date as parameter. */
     renderHeader: PropTypes.any,
     /** Provide aria-level for calendar heading for proper accessibility when used with web (react-native-web) */
-    webAriaLevel: PropTypes.number,
-    /** To show the calendar as a horizontal strip*/
-    horizontal: PropTypes.bool
+    webAriaLevel: PropTypes.number
   };
 
   static defaultProps = {
@@ -278,7 +274,7 @@ class CalendarHeader extends Component<Props> {
           </View>
           {this.renderArrow('right')}
         </View>
-        {this.props.horizontal ? null : this.renderDayNames()}
+        {this.renderDayNames()}
       </View>
     );
   }
