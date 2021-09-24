@@ -4,7 +4,6 @@ import XDate from 'xdate';
 import memoize from 'memoize-one';
 
 import React, {Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
 
 // @ts-expect-error
 import {shouldUpdate} from '../../component-updater';
@@ -12,25 +11,19 @@ import {shouldUpdate} from '../../component-updater';
 import {isToday as dateutils_isToday} from '../../dateutils';
 // @ts-expect-error
 import {xdateToData} from '../../interface';
-import {Theme} from 'types';
 // @ts-expect-error
 import {SELECT_DATE_SLOT} from '../../testIDs';
 import BasicDay, {BasicDayProps} from './basic';
 import PeriodDay from './period';
 import {MarkingProps} from './marking';
-import styleConstructor from './../header/style';
 
 const basicDayPropsTypes = _.omit(BasicDay.propTypes, 'date');
-const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 export interface DayProps extends Omit<BasicDayProps, 'date'> {
-  theme?: Theme;
   /** The day to render */
   day?: Date;
   /** Provide custom day rendering component */
   dayComponent?: any;
-  /** To show the calendar as a horizontal strip*/
-  horizontal?: boolean;
 }
 
 export default class Day extends Component<DayProps> {
@@ -38,7 +31,6 @@ export default class Day extends Component<DayProps> {
 
   static propTypes = {
     ...basicDayPropsTypes,
-    theme: PropTypes.object,
     /** The day to render */
     day: PropTypes.object,
     /** Provide custom day rendering component */
@@ -46,14 +38,6 @@ export default class Day extends Component<DayProps> {
     /** To show the calendar as a horizontal strip*/
     horizontal: PropTypes.bool
   };
-
-  style: any;
-
-  constructor(props: DayProps) {
-    super(props);
-
-    this.style = styleConstructor(props.theme);
-  }
 
   shouldComponentUpdate(nextProps: DayProps) {
     return shouldUpdate(this.props, nextProps, [
@@ -127,30 +111,14 @@ export default class Day extends Component<DayProps> {
     const accessibilityLabel = this.getAccessibilityLabel(day, marking, isToday);
 
     return (
-      <View style={this.props.horizontal ? styles.container : null}>
-        {this.props.horizontal && (
-          <Text style={[this.style.dayHeader, styles.mb18]}>{date ? dayNames[day?.getDay() || 0] : day}</Text>
-        )}
-        <Component
-          {...dayProps}
-          date={date}
-          testID={`${SELECT_DATE_SLOT}-${date.dateString}`}
-          accessibilityLabel={accessibilityLabel}
-        >
-          {date ? day?.getDate() : day}
-        </Component>
-      </View>
+      <Component
+        {...dayProps}
+        date={date}
+        testID={`${SELECT_DATE_SLOT}-${date.dateString}`}
+        accessibilityLabel={accessibilityLabel}
+      >
+        {date ? day?.getDate() : day}
+      </Component>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  mb18: {
-    marginBottom: 18
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    margin: 8
-  }
-});
