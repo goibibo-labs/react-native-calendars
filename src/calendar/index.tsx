@@ -275,7 +275,7 @@ class Calendar extends Component<CalendarProps, CalendarState> {
       week.push(this.renderDay(day, id2));
       const dayTime = day.getTime();
       if (dayTime === parseDate(this.props?.current)?.getTime()) {
-        horizontalScrollViewOffset = id2;
+        horizontalScrollViewOffset = (parseDate(this.props?.current)?.getDate() - 1) / 8;
       }
     }, this);
 
