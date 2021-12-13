@@ -309,6 +309,7 @@ class Calendar extends Component<CalendarProps, CalendarState> {
             showsHorizontalScrollIndicator={false}
             horizontal
             ref={this.horizontalScrollViewRef}
+            scrollToOverflowEnabled
           >
             {weeks}
           </ScrollView>
